@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>desktop-jianghu v3 preview</title>
+<style>
+  :root {
+    --dsw-alias-bg-overlay: #26272d;
+    --dsw-alias-bg-layer-1: #1f2025;
+    --dsw-alias-bg-layer-2: #2c2e35;
+    --dsw-alias-border-l1: #383a42;
+    --dsw-alias-border-l2: #4a4d57;
+    --dsw-alias-label-primary: #e9e7e2;
+    --dsw-alias-label-secondary: #a9a59c;
+    --dsw-alias-state-success-primary: #6fbf73;
+  }
+  html.light {
+    --dsw-alias-bg-overlay: #ffffff;
+    --dsw-alias-bg-layer-1: #f4f5f7;
+    --dsw-alias-bg-layer-2: #e9ebef;
+    --dsw-alias-border-l1: #d6d9df;
+    --dsw-alias-border-l2: #b9bec6;
+    --dsw-alias-label-primary: #22252b;
+    --dsw-alias-label-secondary: #5d6470;
+    --dsw-alias-state-success-primary: #2f8f43;
+  }
+  html, body { margin: 0; height: 100%; background: #14151a; }
+  html.light, html.light body { background: #eef0f3; }
+  #root { width: 100vw; height: 100vh; }
+</style>
+<script src="../node_modules/react/umd/react.development.js"></script>
+<script src="../node_modules/react-dom/umd/react-dom.development.js"></script>
+<script>
+  window.__errs = [];
+  window.addEventListener('error', function (e) {
+    window.__errs.push(e.message + ' @' + (e.filename || '') + ':' + (e.lineno || ''));
+  });
+  window.addEventListener('unhandledrejection', function (e) {
+    window.__errs.push('rejection: ' + (e.reason && e.reason.message ? e.reason.message : String(e.reason)));
+  });
+  setTimeout(function () {
+    var pre = document.createElement('pre');
+    pre.id = 'err';
+    pre.textContent = window.__errs.length ? 'ERRORS: ' + window.__errs.join(' || ') : 'SCENE ' + (new URLSearchParams(location.search).get('scene') || 'home') + ' OK';
+    document.body.appendChild(pre);
+  }, 2600);
+
+  function buildState(scene) {
+    var now = Date.now();
+    var base = {
+      v: 2, setup: true, name: '测试侠', gender: 'male', level: 30, exp: 12000,
+      potential: 0, con: 28, int: 8, str: 28, end: 28, agi: 20,
+      stamina: 120, silver: 5600, wins: 17, losses: 6, streak: 3, bestStreak: 5,
+      training: true, lastTick: now,
+      log: ['你踏入江湖，自「测试侠」始。', '第 12 回合，你胜了「山野樵夫」。'],
+      sect: 'shaolin', skills: { sl_jinzhong: true, sl_fumo: true }, skillPoints: 3,
+      growth: [
+        { id: 'joined', title: '拜入少林', text: '你于山门之前叩首，自此晨钟暮鼓。', t: now - 86400000 },
+        { id: 'lv10', title: '武林新丁', text: '修为渐深，江湖上开始有人记得你的名字。', t: now - 43200000 },
+        { id: 'q1', title: '江湖纪事', text: '初入洛阳', t: now - 3600000 }
+      ],
+      ach: { joined: now - 86400000, lv10: now - 43200000, q1: now - 3600000 },
+      stats: {
+        battles: 23, travels: 9, eliteWins: 3, equips: 3,
+        dests: { shenshan: 4, hupo: 2, shanzhai: 1, gudao: 1, shijing: 1, zhulin: 0 }
+      },
+      settings: { snap: true, autoHide: true, size: 'compact', anim: true, autosave: true },
+      pos: { x: 64, y: 96 }, collapsed: false, dock: null,
+      pills: 0, bolus: 0, mode: 'train',
+      shop: null,
+      quest: { idx: 2, choice80: null, hidden99: null, base: { wins: 0, eliteWins: 0, travels: 0, equips: 0, dests: {} } },
+      equip: { weapon: null, armor: null },
+      bag: [],
+      base: undefined
+    };
+    if (scene === 'female') { base.gender = 'female'; base.name = '慕容雪'; base.sect = 'emei'; base.skills = { em_qingxin: true, em_feixu: true }; }
+    if (scene === 'gaibang') { base.name = '乔一鸣'; base.sect = 'gaibang'; base.int = 60; base.agi = 20; base.level = 100; base.skills = {}; }
+    if (scene === 'ending') { base.level = 100; base.quest = { idx: 30, choice80: 'shaolin_rush' }; }
+    if (scene === 'max') { base.level = 100; base.exp = 98765432; base.potential = 0; base.mode = 'train'; base.quest = { idx: 30, choice80: 'shaolin_rush' }; }
+    if (scene === 'low') { base.level = 3; base.exp = 30; base.potential = 11; base.silver = 120; base.wins = 1; base.losses = 1; base.sect = null; base.skills = {}; }
+    if (scene === 'pill' || scene === 'shop2') { base.pills = 2; base.bolus = 2; }
+    if (scene === 'equip2') {
+      base.equip = { weapon: { uid: 'w1', kind: 'weapon', tier: 6, lv: 30, name: '降魔杵·私制', atk: 39, spd: 5, quality: 'private' }, armor: null };
+      base.bag = [
+        { uid: 'b1', kind: 'armor', tier: 6, lv: 30, name: '铁线僧衣·官制', def: 34, hp: 120, quality: 'official' },
+        { uid: 'b2', kind: 'weapon', tier: 6, lv: 30, name: '柳叶戒刀·损坏', atk: 24, spd: 2, quality: 'broken' }
+      ];
+    }
+    if (scene === 'questalt') base.quest = { idx: 1, choice80: null, hidden99: null, base: { wins: 0, eliteWins: 0, travels: 0, equips: 0, dests: {} } };
+    return base;
+  }
+
+  (function () {
+    var params = new URLSearchParams(location.search);
+    var scene = params.get('scene') || 'home';
+    if (params.get('theme') === 'light') document.documentElement.classList.add('light');
+    var store = {};
+    if (scene !== 'onboard') {
+      store['desktop-jianghu.save.v1'] = JSON.stringify(buildState(scene));
+    }
+    var shim = {
+      getItem: function (k) { return Object.prototype.hasOwnProperty.call(store, k) ? store[k] : null; },
+      setItem: function (k, v) { store[k] = String(v); },
+      removeItem: function (k) { delete store[k]; },
+      clear: function () { store = {}; }
+    };
+    Object.defineProperty(window, 'localStorage', { value: shim, configurable: true });
+  })();
+
+  window.__registered = null;
+  window.__ModuleLoader__ = {
+    load: function (mod) {
+      window.__plugin = mod.factory(function (name) {
+        if (name === 'react') return window.React;
+        throw new Error('unexpected require: ' + name);
+      });
+    }
+  };
+</script>
+<script src="../client.js"></script>
+<script>
+  (function () {
+    window.addEventListener('DOMContentLoaded', function () {
+      var scene = new URLSearchParams(location.search).get('scene') || 'home';
+      if (scene === 'shop2') { Math.random = function () { return 0.1; }; }
+      var ctx = {
+        locale: {
+          register: function () { return function () {}; },
+          bind: function () { return function (key) { return key; }; }
+        },
+        slots: {
+          inject: function (owner, fn) { fn(); },
+          register: function (spec, Comp) { window.__registered = Comp; return function () {}; }
+        },
+        effect: function (fn) { var d = fn(); return d || function () {}; }
+      };
+      window.__plugin.apply(ctx);
+      var root = ReactDOM.createRoot(document.getElementById('root'));
+      root.render(React.createElement(window.__registered));
+
+      function clickEl(el) {
+        if (!el) return false;
+        el.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+        return true;
+      }
+      function findByText(sel, text) {
+        var nodes = document.querySelectorAll(sel);
+        for (var i = 0; i < nodes.length; i += 1) {
+          if ((nodes[i].textContent || '').indexOf(text) >= 0) return nodes[i];
+        }
+        return null;
+      }
+      function clickText(text) {
+        return clickEl(findByText('button, [role="button"]', text));
+      }
+      function later(fn, ms) { setTimeout(fn, ms || 260); }
+
+      later(function () {
+        if (scene === 'battle0') { clickText('比武 · 10'); later(function () { clickText('挑战'); }, 300); }
+        if (scene === 'battle' || scene === 'battle2') {
+          clickText('比武 · 10');
+          later(function () { clickText('挑战'); }, 350);
+          if (scene === 'battle2') later(function () { clickText('跳过'); }, 3400);
+        }
+        if (scene === 'travel') clickText('游历 · 15');
+        if (scene === 'travel2' || scene === 'travel3') {
+          clickText('游历 · 15');
+          later(function () {
+            clickEl(findByText('.jw3-cell', '深山'));
+            later(function () { clickEl(document.querySelector('.jw3-grid2 button')); }, 300);
+          }, 350);
+        }
+        if (scene === 'quest' || scene === 'questalt') clickText('任务');
+        if (scene === 'equip2') clickText('装备');
+        if (scene === 'sect' || scene === 'female') clickText('门派');
+        if (scene === 'equip' || scene === 'shop' || scene === 'shop2') clickText('装备');
+        if (scene === 'pill') { /* home shows pill button */ }
+        if (scene === 'growth') clickText('成长');
+        if (scene === 'settings') clickText('设置');
+        if (scene === 'gaibang') clickText('任务');
+        if (scene === 'ending') clickText('门派');
+        if (scene === 'collapsed') {
+          var c = document.querySelector('.jw3-icon-btn');
+          if (c) clickEl(c);
+        }
+        if (scene === 'interact') {
+          var log = [];
+          var put = function (k, v) { log.push(k + '=' + v); };
+          later(function () {
+            clickEl(document.querySelector('.jw3-icon-btn'));
+            later(function () {
+              put('pillAfterCollapse', !!document.querySelector('.jw3-pill'));
+              clickEl(document.querySelector('.jw3-pill'));
+              later(function () {
+                var card = document.querySelector('.jw3-card');
+                put('cardAfterExpand', !!card);
+                put('left0', card ? card.style.left : '?');
+                var head = document.querySelector('.jw3-head');
+                var opts = { bubbles: true, pointerId: 7, button: 0, clientX: 200, clientY: 200 };
+                head.dispatchEvent(new PointerEvent('pointerdown', opts));
+                window.dispatchEvent(new PointerEvent('pointermove', { bubbles: true, pointerId: 7, clientX: 420, clientY: 380 }));
+                window.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, pointerId: 7, clientX: 420, clientY: 380 }));
+                later(function () {
+                  var c2 = document.querySelector('.jw3-card');
+                  put('left1', c2 ? c2.style.left : '?');
+                  put('top1', c2 ? c2.style.top : '?');
+                  var h2 = document.querySelector('.jw3-head');
+                  h2.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, pointerId: 8, button: 0, clientX: 300, clientY: 300 }));
+                  window.dispatchEvent(new PointerEvent('pointermove', { bubbles: true, pointerId: 8, clientX: 12, clientY: 300 }));
+                  window.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, pointerId: 8, clientX: 12, clientY: 300 }));
+                  later(function () {
+                    var c3 = document.querySelector('.jw3-card');
+                    put('dockLeft', c3 ? c3.className.indexOf('jw3-dock-left') >= 0 : '?');
+                    put('left2', c3 ? c3.style.left : '?');
+                    clickEl(document.querySelector('.jw3-icon-btn'));
+                    later(function () {
+                      var pill = document.querySelector('.jw3-pill');
+                      put('pillAfterRedrag', !!pill);
+                      if (pill) {
+                        pill.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, pointerId: 9, button: 0, clientX: 200, clientY: 200 }));
+                        window.dispatchEvent(new PointerEvent('pointermove', { bubbles: true, pointerId: 9, clientX: 890, clientY: 915 }));
+                        window.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, pointerId: 9, clientX: 890, clientY: 915 }));
+                      }
+                      later(function () {
+                        var p2 = document.querySelector('.jw3-pill');
+                        put('pillDockRight', p2 ? p2.className.indexOf('jw3-dock-right') >= 0 : '?');
+                        put('pillLeft', p2 ? p2.style.left : '?');
+                        put('pillTop', p2 ? p2.style.top : '?');
+                        var pre = document.createElement('pre');
+                        pre.id = 'interact';
+                        pre.style.cssText = 'position:fixed;left:8px;bottom:8px;color:#111;background:#fff;font-size:13px;z-index:9999;padding:6px;';
+                        pre.textContent = 'INTERACT ' + log.join(' | ');
+                        document.body.appendChild(pre);
+                      }, 150);
+                    }, 150);
+                  }, 150);
+                }, 150);
+              }, 150);
+            }, 150);
+          }, 150);
+        }
+      }, 450);
+    });
+  })();
+</script>
+</head>
+<body>
+<div id="root"></div>
+</body>
+</html>

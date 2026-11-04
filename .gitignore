@@ -1,0 +1,10 @@
+node_modules/
+.dev/
+.npm-cache/
+.tmp-shot/
+coverage/
+*.log
+.DS_Store
+Thumbs.db
+dist/
+*.tgz
