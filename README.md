@@ -1,5 +1,7 @@
 # 桌面江湖 · Desktop Jianghu
 
+[![CI](https://github.com/0xfri/desktop-jianghu/actions/workflows/ci.yml/badge.svg)](https://github.com/0xfri/desktop-jianghu/actions/workflows/ci.yml)
+
 > 一个常驻在 [DeepSeek Harness](https://github.com/deepseek-ai) 桌面上的文字武侠小挂件：
 > 挂机修炼、打坐调息、三选一比武、门派主线、江湖游历、装备与绝世神兵。
 > 全部数据存在本地浏览器里，不联网、不调用模型、无付费点。
