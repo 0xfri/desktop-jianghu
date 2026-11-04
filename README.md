@@ -1,6 +1,7 @@
 # 桌面江湖 · Desktop Jianghu
 
 [![CI](https://github.com/0xfri/desktop-jianghu/actions/workflows/ci.yml/badge.svg)](https://github.com/0xfri/desktop-jianghu/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/dsh-desktop-jianghu.svg)](https://www.npmjs.com/package/dsh-desktop-jianghu)
 
 > 一个常驻在 [DeepSeek Harness](https://github.com/deepseek-ai) 桌面上的文字武侠小挂件：
 > 挂机修炼、打坐调息、三选一比武、门派主线、江湖游历、装备与绝世神兵。
@@ -44,6 +45,24 @@ no network, no model calls. Built as a Cordis client plugin (React + CSS, no bit
 
 要求：DeepSeek Harness ≥ 已支持第三方 bundle 的版本（插件管理器 / plugin_manager）。
 
+**方式一（推荐）：按包名安装。**
+
+在 DSH 的「添加插件」输入框直接填：
+
+```text
+dsh-desktop-jianghu
+```
+
+安装器会从 npm 拉取最新版本（[npm 包主页](https://www.npmjs.com/package/dsh-desktop-jianghu)）。
+
+**方式二：按 GitHub 仓库安装。**
+
+```text
+https://github.com/0xfri/desktop-jianghu
+```
+
+**方式三：本地目录安装。**
+
 ```bash
 git clone https://github.com/0xfri/desktop-jianghu.git
 ```
@@ -57,8 +76,8 @@ plugin_manager install_bundle  /path/to/desktop-jianghu
 安装成功后刷新页面（F5 / Ctrl+R），右下角出现「桌面江湖」悬浮卡即加载成功。若仍未出现，
 重启一次 DSH 让宿主重新加载客户端模块。
 
-> `@local/` 前缀是开发期的本地 link 安装；本仓库改为可发布包名
-> `dsh-desktop-jianghu`，安装入口为包根目录（含 `package.json` 与 `cordis.patch.yml`）。
+> `@local/` 前缀是开发期的本地 link 安装；发布包名为 `dsh-desktop-jianghu`，
+> 安装入口为包根目录（含 `package.json` 与 `cordis.patch.yml`）。
 
 ## 使用
 
@@ -131,11 +150,12 @@ client.js         构建产物（请勿直接手改）
   不含任何原作素材，玩法致敬 2009 年前后的手机文字武侠社区游戏。
 - 游戏内门派、人物、剧情均为原创虚构，如有雷同纯属巧合。
 
-## 发布状态（GitHub）
+## 发布状态（GitHub / npm）
 
 - [x] `package.json` 已填 `repository` / `homepage` / `bugs` / `author`（`0xfri`）。
-- [x] 包名 `dsh-desktop-jianghu`（发布到 npm 前请确认该名称可用，或改成你的 scope）。
+- [x] 包名 `dsh-desktop-jianghu` 已发布到 npm（当前版本 `0.1.0`）。
 - [x] README 中的仓库地址已指向 `0xfri/desktop-jianghu`。
 - [x] `npm test` 通过（70 项）、`npm run build` 产物已提交。
-- [ ] 在 GitHub 创建仓库并推送（本机可 `git init && git add . && git commit`，仓库已含 `.gitignore`；
-      或直接使用 `scripts/publish-repo.ps1`）。
+- [x] GitHub 仓库已创建并推送：https://github.com/0xfri/desktop-jianghu ，发布 Release `v0.1.0`。
+
+更新版本时：`npm version patch` → `npm run build` → `npm test` → `git push --follow-tags` → `npm publish`。
