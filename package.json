@@ -1,6 +1,6 @@
 {
   "name": "dsh-desktop-jianghu",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Desktop Jianghu — a persistent wuxia text game for the DeepSeek Harness desktop: idle cultivation, turn-based duels, sect storylines, quests, equipment and legendary weapons. Level cap 100.",
   "type": "module",
   "license": "MIT",

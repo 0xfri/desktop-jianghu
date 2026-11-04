@@ -3694,6 +3694,7 @@ window.__ModuleLoader__.load({
       const drag = useRef(null);
       const suppressClick = useRef(false);
       const holdRef = useRef({ timer: null, interval: null });
+      const nameRef = useRef(null);
 
       function refresh() {
         rerender(function (v) { return (v + 1) % 1000000; });
@@ -3710,7 +3711,10 @@ window.__ModuleLoader__.load({
       useEffect(function () {
         let count = 0;
         const id = window.setInterval(function () {
-          if (!S) return;
+          if (!S || !S.setup) return;
+          if (typeof document !== 'undefined' && document.hidden) return;
+          const ae = typeof document !== 'undefined' ? document.activeElement : null;
+          if (ae && ae.classList && ae.classList.contains('jw3-input')) return;
           const r = v3Tick(S, Date.now());
           if (r) {
             if (r.gains && r.gains.minutes >= 1) {
@@ -3765,7 +3769,10 @@ window.__ModuleLoader__.load({
         y = Math.max(6, Math.min(H - h - 6, y));
         if (!S.pos || Math.abs(x - S.pos.x) > 0.5 || Math.abs(y - S.pos.y) > 0.5) {
           S.pos = { x: x, y: y };
-          refresh();
+          /* write position straight to the DOM: never trigger a re-render from
+             inside a layout effect (a re-render loop makes text inputs laggy). */
+          el.style.left = x + 'px';
+          el.style.top = y + 'px';
         }
       });
 
@@ -4039,7 +4046,7 @@ window.__ModuleLoader__.load({
             h('div', { className: 'jw3-row' },
               h('span', { className: 'jw3-muted' }, '名号'),
               h('input', {
-                className: 'jw3-input', value: UI3.onboardName,
+                className: 'jw3-input', ref: nameRef, defaultValue: UI3.onboardName,
                 placeholder: '取个侠名（最多 12 字）',
                 onChange: function (e) { UI3.onboardName = e.target.value; },
                 style: { flex: 1, marginLeft: '8px', background: 'var(--dsw-alias-bg-layer-1,#1f2025)', border: '1px solid var(--dsw-alias-border-l2,#4a4d57)', color: 'inherit', borderRadius: '6px', padding: '4px 7px', fontFamily: 'inherit' },
@@ -4055,7 +4062,8 @@ window.__ModuleLoader__.load({
             h('button', {
               className: 'jw3-btn gold', style: { width: '100%' },
               onClick: function () {
-                const nm = (UI3.onboardName || '').trim().slice(0, 12);
+                const raw = nameRef.current ? nameRef.current.value : UI3.onboardName;
+                const nm = (raw || '').trim().slice(0, 12);
                 if (!nm) { v3Toast('请先取个名号'); return; }
                 const s = newStateV3(nm);
                 s.setup = true;
